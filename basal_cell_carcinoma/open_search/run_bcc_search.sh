@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=CPA_pc
+#SBATCH --job-name=melanoma
 #SBATCH --output=logs/melanoma_search.%j.out
 #SBATCH --error=logs/melanoma_search.%j.err
 
 eval "$(conda shell.bash hook)"
-conda activate STATE 
+conda activate PHAROS
 
 cd /oak/stanford/groups/larsms/Users/jbezney/tahoe100m
 
