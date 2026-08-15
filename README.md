@@ -13,57 +13,57 @@ All code used to reproduce the findings in "Turning single-cell perturbation mod
 
 ## 1. (admissibility_generation) 3-part admissibility test 
 
-### A. (target_calibration) Generating a calibration of what a successful conversion looks like 
+1. (target_calibration) Generating a calibration of what a successful conversion looks like 
 
-### B. (tahoe_embedding_manifold) Determining if a new dataset falls outside the distribution of the Tahoe-100M 
+2. (tahoe_embedding_manifold) Determining if a new dataset falls outside the distribution of the Tahoe-100M 
 
 ## 2.1 (CPA_A549_cell_line) A549 cell line with 6 2-drug perturbations
 
-### A. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
+1. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
 
-### B. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
+2. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
 
-### C. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
+3. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
 
-### D. (open_search) PHAROS runs in open-search mode
+4. (open_search) PHAROS runs in open-search mode
 
-### E. (supplementary) Additional analysis for supplementary figures
+5. (supplementary) Additional analysis for supplementary figures
 
 ## 2.2 (Sciplex_3brain_cancer_cell_lines) 3 brain cancer cell lines each with 10 2-drug perturbations 
 
-### A. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
+1. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
 
-### B. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
+2. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
 
-### C. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
+3. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
 
-### D. (open_search) PHAROS runs in open-search mode
+4. (open_search) PHAROS runs in open-search mode
 
-### E. (supplementary) Additional analysis for supplementary figures
+5. (supplementary) Additional analysis for supplementary figures
 
 ## 3.1 (metastatic_breast_cancer) HR+/HER2- metastatic/primary breast cancer
 
-### A. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
+1. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
 
-### B. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
+2. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
 
-### C. (breast_cancer_sample_matching) Primary to metastatic sample matching using Optimal Transport distance
+3. (breast_cancer_sample_matching) Primary to metastatic sample matching using Optimal Transport distance
 
-### D. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
+4. (hypothesis_driven) PHAROS runs in hypothesis-driven mode
 
-### E. (open_search) PHAROS runs in open-search mode
+5. (open_search) PHAROS runs in open-search mode
 
-### F. (supplementary) Additional analysis for supplementary figures
+6. (supplementary) Additional analysis for supplementary figures
 
 ## 3.2 (basal_cell_carcinoma) Immunotherapy responsive/non-responsive basal cell carcinoma 
 
-### A. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
+1. (preprocess) Data download, preprocessing, and embedding with the single-cell STATE foundation model SE600M
 
-### B. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
+2. (admissibility) Quantifying if the dataset falls within the embedding manifold of Tahoe-100M and determining if each source-to-start conversion separates in latent space and justifies a tangible conversion objective.
 
-### C. (open_search) PHAROS runs in open-search mode
+3. (open_search) PHAROS runs in open-search mode
 
-### D. (STRING_network) JAK1/2 protein-protein interaction network analysis
+4. (STRING_network) JAK1/2 protein-protein interaction network analysis
 
 ## 4 (appendix_informative_analysis) Additional analysis modules for the appendix that are not referenced in the main results 
 
