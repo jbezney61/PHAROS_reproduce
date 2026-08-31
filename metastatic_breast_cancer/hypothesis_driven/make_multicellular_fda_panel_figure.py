@@ -67,7 +67,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv0",
         "Malignant_Metastasis",
         "Malignant_Primary",
-        "Malignant-state reversal\n(metastasis → primary)",
+        "Malignant-state reversal\n(metastasic → primary)",
         "Malignant-state reversal",
         "Malignant",
         "tumor_efficacy",
@@ -76,7 +76,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv1",
         "T02 CD8 Teffectormemory-GZMK_Metastasis",
         "T02 CD8 Teffectormemory-GZMK_Primary",
-        "CD8 effector-memory rescue\n(GZMK⁺ → GZMK⁺)",
+        "CD8 effector-memory rescue\n(GZMK⁺ metastatic → GZMK⁺ primary)",
         "CD8 GZMK⁺ rescue",
         "T cells",
         "immune_rescue",
@@ -85,7 +85,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv2",
         "T03 Trm-ZNF683_Metastasis",
         "T03 Trm-ZNF683_Primary",
-        "Tissue-resident T-cell rescue\n(ZNF683⁺ Trm → Trm)",
+        "Tissue-resident T-cell rescue\n(ZNF683⁺ Trm metastatic → ZNF683⁺ Trm primary)",
         "ZNF683⁺ Trm rescue",
         "T cells",
         "immune_rescue",
@@ -94,7 +94,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv3",
         "T09 CD8 Texhausted-CXCL13_Metastasis",
         "T03 Trm-ZNF683_Primary",
-        "CD8 exhaustion rescue\n(CXCL13⁺ exhausted → ZNF683⁺ Trm)",
+        "CD8 exhaustion rescue\n(CXCL13⁺ exhausted metastatic → ZNF683⁺ Trm primary)",
         "Exhausted CD8 → Trm",
         "T cells",
         "immune_rescue",
@@ -103,7 +103,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv4",
         "M08 Macrophage-CCL2_Metastasis",
         "M09 Macrophage-CX3CR_Primary",
-        "CCL2 macrophage reprogramming\n(CCL2⁺ → CX3CR⁺)",
+        "CCL2 macrophage reprogramming\n(CCL2⁺ metastatic → CX3CR⁺ primary)",
         "CCL2⁺ → CX3CR⁺ macrophage",
         "Myeloid",
         "immune_rescue",
@@ -112,7 +112,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv5",
         "M07 Macrophage-SPP1_Metastasis",
         "M09 Macrophage-CX3CR_Primary",
-        "SPP1 macrophage reprogramming\n(SPP1⁺ → CX3CR⁺)",
+        "SPP1 macrophage reprogramming\n(SPP1⁺ metastatic → CX3CR⁺ primary)",
         "SPP1⁺ → CX3CR⁺ macrophage",
         "Myeloid",
         "immune_rescue",
@@ -121,7 +121,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv6",
         "N01 NK-CD16_Metastasis",
         "N01 NK-CD16_Primary",
-        "NK-cell compatibility\n(CD16⁺ NK → primary counterpart)",
+        "NK-cell compatibility\n(CD16⁺ NK metastatic → CD16⁺ NK primary)",
         "CD16⁺ NK compatibility",
         "Compatibility",
         "immune_compatibility",
@@ -130,7 +130,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "conv7",
         "B02 B Memory_Metastasis",
         "B02 B Memory_Primary",
-        "Memory-B-cell compatibility\n(memory B → primary counterpart)",
+        "Memory-B-cell compatibility\n(memory B metastatic → memory B primary)",
         "Memory-B compatibility",
         "Compatibility",
         "immune_compatibility",
@@ -638,7 +638,6 @@ def plot_clustered_heatmap(
     tree: Any,
     *,
     title: str,
-    panel_letter: str,
     colorbar_label: str,
     cmap: Any,
     norm: Any,
@@ -646,6 +645,9 @@ def plot_clustered_heatmap(
     output_stem: Path,
     formats: Sequence[str],
     dpi: int,
+    show_therapy_classes: bool = True,
+    compact: bool = False,
+    y_label_pad: float = 3.5,
 ) -> list[Path]:
     ordered = matrix.iloc[:, list(column_order)]
     pairs = ordered.columns.astype(str).tolist()
@@ -655,12 +657,22 @@ def plot_clustered_heatmap(
         for _, row in metadata.iterrows()
     ]
 
-    fig = plt.figure(figsize=(13.2, 7.7))
-    dend_ax = fig.add_axes([0.355, 0.765, 0.53, 0.105])
-    class_ax = fig.add_axes([0.355, 0.718, 0.53, 0.026])
-    row_ax = fig.add_axes([0.326, 0.145, 0.016, 0.55])
-    heat_ax = fig.add_axes([0.355, 0.145, 0.53, 0.55])
-    cbar_ax = fig.add_axes([0.905, 0.265, 0.017, 0.32])
+    if compact:
+        fig = plt.figure(figsize=(13.2, 5.8))
+        dend_ax = fig.add_axes([0.355, 0.765, 0.53, 0.105])
+        class_ax = None
+        row_ax = fig.add_axes([0.331, 0.205, 0.012, 0.50])
+        heat_ax = fig.add_axes([0.355, 0.205, 0.53, 0.50])
+        cbar_ax = fig.add_axes([0.905, 0.305, 0.017, 0.30])
+        title_y = 0.925
+    else:
+        fig = plt.figure(figsize=(13.2, 7.7))
+        dend_ax = fig.add_axes([0.355, 0.765, 0.53, 0.105])
+        class_ax = fig.add_axes([0.355, 0.718, 0.53, 0.026]) if show_therapy_classes else None
+        row_ax = fig.add_axes([0.326, 0.145, 0.016, 0.55])
+        heat_ax = fig.add_axes([0.355, 0.145, 0.53, 0.55])
+        cbar_ax = fig.add_axes([0.905, 0.265, 0.017, 0.32])
+        title_y = 0.915
 
     if tree is not None:
         dendrogram(
@@ -675,20 +687,27 @@ def plot_clustered_heatmap(
             collection.set_linewidth(1.1)
     dend_ax.axis("off")
 
-    class_indices = [list(THERAPY_CLASS_COLORS).index(value) for value in therapy_classes]
-    class_cmap = ListedColormap(list(THERAPY_CLASS_COLORS.values()))
-    class_ax.imshow(np.asarray(class_indices)[None, :], aspect="auto", cmap=class_cmap, interpolation="nearest")
-    class_ax.set_xticks([])
-    class_ax.set_yticks([])
-    for spine in class_ax.spines.values():
-        spine.set_visible(False)
+    if class_ax is not None:
+        class_indices = [list(THERAPY_CLASS_COLORS).index(value) for value in therapy_classes]
+        class_cmap = ListedColormap(list(THERAPY_CLASS_COLORS.values()))
+        class_ax.imshow(
+            np.asarray(class_indices)[None, :],
+            aspect="auto",
+            cmap=class_cmap,
+            interpolation="nearest",
+        )
+        class_ax.set_xticks([])
+        class_ax.set_yticks([])
+        for spine in class_ax.spines.values():
+            spine.set_visible(False)
 
     image = heat_ax.imshow(ordered.to_numpy(dtype=float), aspect="auto", cmap=cmap, norm=norm, interpolation="nearest")
     heat_ax.set_xticks(np.arange(len(pairs)))
     heat_ax.set_xticklabels([display_pair_name(pair) for pair in pairs], rotation=45, ha="right", fontsize=8.4)
     heat_ax.set_yticks(np.arange(len(CONVERSIONS)))
     heat_ax.set_yticklabels([spec.display_label for spec in CONVERSIONS], fontsize=9.2)
-    heat_ax.tick_params(axis="both", length=0)
+    heat_ax.tick_params(axis="x", length=0)
+    heat_ax.tick_params(axis="y", length=0, pad=y_label_pad)
 
     values = ordered.to_numpy(dtype=float)
     midpoint = float(getattr(norm, "vcenter", 0.0))
@@ -725,30 +744,36 @@ def plot_clustered_heatmap(
     colorbar.set_label(colorbar_label, fontsize=9)
     colorbar.ax.tick_params(labelsize=8)
 
-    therapy_handles = [Patch(facecolor=color, label=label) for label, color in THERAPY_CLASS_COLORS.items() if label in therapy_classes]
+    therapy_handles = [
+        Patch(facecolor=color, label=label)
+        for label, color in THERAPY_CLASS_COLORS.items()
+        if label in therapy_classes
+    ]
     biology_handles = [Patch(facecolor=color, label=label) for label, color in GROUP_COLORS.items()]
-    fig.legend(
-        handles=therapy_handles,
-        loc="upper center",
-        bbox_to_anchor=(0.62, 0.998),
-        ncol=max(1, len(therapy_handles)),
-        frameon=False,
-        fontsize=8,
-        title="Treatment class",
-        title_fontsize=8.5,
-    )
+    if show_therapy_classes:
+        fig.legend(
+            handles=therapy_handles,
+            loc="upper center",
+            bbox_to_anchor=(0.62, 0.998),
+            ncol=max(1, len(therapy_handles)),
+            frameon=False,
+            fontsize=8,
+            title="Treatment class",
+            title_fontsize=8.5,
+        )
+    biology_anchor = (0.62, 1.005) if compact else (0.60, -0.075)
+    biology_location = "upper center" if compact else "lower center"
     fig.legend(
         handles=biology_handles,
-        loc="lower center",
-        bbox_to_anchor=(0.60, -0.075),
+        loc=biology_location,
+        bbox_to_anchor=biology_anchor,
         ncol=4,
         frameon=False,
         fontsize=8,
         title="Conversion group",
         title_fontsize=8.5,
     )
-    fig.text(0.025, 0.965, panel_letter, fontsize=18, fontweight="bold", va="top")
-    fig.text(0.355, 0.915, title, fontsize=12.5, fontweight="bold", va="top")
+    fig.text(0.355, title_y, title, fontsize=12.5, fontweight="bold", va="top")
     return save_figure(fig, output_stem, formats, dpi)
 
 
@@ -891,7 +916,6 @@ def plot_prioritization(
     key_ax.scatter([0.015], [legend_y - 0.155], s=170, facecolor="none", edgecolor="#D4A017", linewidth=2.0)
     key_ax.text(0.06, legend_y - 0.155, "Gold ring: Pareto-optimal", fontsize=7.3, va="center")
 
-    fig.text(0.025, 0.965, "D", fontsize=18, fontweight="bold", va="top")
     return save_figure(fig, output_stem, formats, dpi)
 
 
@@ -1004,7 +1028,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         column_order,
         tree,
         title="FDA combination performance relative to matched random pairs",
-        panel_letter="B",
         colorbar_label="Random pairs worse than or equal to FDA pair (%)",
         cmap=PERCENTILE_CMAP,
         norm=TwoSlopeNorm(vmin=0.0, vcenter=50.0, vmax=100.0),
@@ -1012,6 +1035,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         output_stem=figures_dir / "panel_B_random_superiority_heatmap",
         formats=formats,
         dpi=args.dpi,
+        show_therapy_classes=False,
+        compact=True,
+        y_label_pad=32.0,
     )
     figure_paths["Panel C"] = plot_clustered_heatmap(
         effect_matrix,
@@ -1019,7 +1045,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         column_order,
         tree,
         title="Magnitude and direction of predicted source-to-target conversion",
-        panel_letter="C",
         colorbar_label="Baseline source→target distance closed (%)",
         cmap=EFFECT_CMAP,
         norm=TwoSlopeNorm(vmin=-effect_limit, vcenter=0.0, vmax=effect_limit),
