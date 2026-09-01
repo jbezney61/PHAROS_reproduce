@@ -64,7 +64,7 @@ class ConversionSpec:
 
 CONVERSIONS: tuple[ConversionSpec, ...] = (
     ConversionSpec(
-        "conv0",
+        "conv0_her2neg",
         "Malignant_Metastasis",
         "Malignant_Primary",
         "Malignant-state reversal\n(metastasic → primary)",
@@ -73,7 +73,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "tumor_efficacy",
     ),
     ConversionSpec(
-        "conv1",
+        "conv1_her2neg",
         "T02 CD8 Teffectormemory-GZMK_Metastasis",
         "T02 CD8 Teffectormemory-GZMK_Primary",
         "CD8 effector-memory rescue\n(GZMK⁺ metastatic → GZMK⁺ primary)",
@@ -82,7 +82,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "immune_rescue",
     ),
     ConversionSpec(
-        "conv2",
+        "conv2_her2neg",
         "T03 Trm-ZNF683_Metastasis",
         "T03 Trm-ZNF683_Primary",
         "Tissue-resident T-cell rescue\n(ZNF683⁺ Trm metastatic → ZNF683⁺ Trm primary)",
@@ -91,7 +91,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "immune_rescue",
     ),
     ConversionSpec(
-        "conv3",
+        "conv3_her2neg",
         "T09 CD8 Texhausted-CXCL13_Metastasis",
         "T03 Trm-ZNF683_Primary",
         "CD8 exhaustion rescue\n(CXCL13⁺ exhausted metastatic → ZNF683⁺ Trm primary)",
@@ -100,25 +100,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "immune_rescue",
     ),
     ConversionSpec(
-        "conv4",
-        "M08 Macrophage-CCL2_Metastasis",
-        "M09 Macrophage-CX3CR_Primary",
-        "CCL2 macrophage reprogramming\n(CCL2⁺ metastatic → CX3CR⁺ primary)",
-        "CCL2⁺ → CX3CR⁺ macrophage",
-        "Myeloid",
-        "immune_rescue",
-    ),
-    ConversionSpec(
-        "conv5",
-        "M07 Macrophage-SPP1_Metastasis",
-        "M09 Macrophage-CX3CR_Primary",
-        "SPP1 macrophage reprogramming\n(SPP1⁺ metastatic → CX3CR⁺ primary)",
-        "SPP1⁺ → CX3CR⁺ macrophage",
-        "Myeloid",
-        "immune_rescue",
-    ),
-    ConversionSpec(
-        "conv6",
+        "conv6_her2neg",
         "N01 NK-CD16_Metastasis",
         "N01 NK-CD16_Primary",
         "NK-cell compatibility\n(CD16⁺ NK metastatic → CD16⁺ NK primary)",
@@ -127,7 +109,7 @@ CONVERSIONS: tuple[ConversionSpec, ...] = (
         "immune_compatibility",
     ),
     ConversionSpec(
-        "conv7",
+        "conv7_her2neg",
         "B02 B Memory_Metastasis",
         "B02 B Memory_Primary",
         "Memory-B-cell compatibility\n(memory B metastatic → memory B primary)",
@@ -143,7 +125,6 @@ CONVERSION_IDS = tuple(CONVERSION_BY_ID)
 GROUP_COLORS = {
     "Malignant": "#7A5195",
     "T cells": "#2C7FB8",
-    "Myeloid": "#E07A1F",
     "Compatibility": "#3A9D5D",
 }
 
@@ -797,9 +778,9 @@ def build_prioritization_table(
     rows = []
     metadata = pair_metadata.set_index(pair_metadata["pair_id"].astype(str))
     for pair_id in effect_matrix.columns.astype(str):
-        malignant = float(effect_matrix.loc["conv0", pair_id])
-        immune_values = effect_matrix.loc[["conv1", "conv2", "conv3", "conv4", "conv5"], pair_id].to_numpy(dtype=float)
-        compatibility_values = effect_matrix.loc[["conv6", "conv7"], pair_id].to_numpy(dtype=float)
+        malignant = float(effect_matrix.loc["conv0_her2neg", pair_id])
+        immune_values = effect_matrix.loc[["conv1_her2neg", "conv2_her2neg", "conv3_her2neg"], pair_id].to_numpy(dtype=float)
+        compatibility_values = effect_matrix.loc[["conv6_her2neg", "conv7_her2neg"], pair_id].to_numpy(dtype=float)
         row = metadata.loc[pair_id]
         rows.append(
             {
@@ -1028,7 +1009,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         column_order,
         tree,
         title="FDA combination performance relative to matched random pairs",
-        colorbar_label="Random pairs worse than or equal to FDA pair (%)",
+        colorbar_label="Random pairs worse than\nor equal to FDA pair (%)",
         cmap=PERCENTILE_CMAP,
         norm=TwoSlopeNorm(vmin=0.0, vcenter=50.0, vmax=100.0),
         annotation_format=".0f",
