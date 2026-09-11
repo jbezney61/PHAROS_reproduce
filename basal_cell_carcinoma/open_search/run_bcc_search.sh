@@ -9,52 +9,33 @@ conda activate PHAROS
 cd /oak/stanford/groups/larsms/Users/jbezney/tahoe100m
 
 ST_RUN=/oak/stanford/groups/larsms/Users/jbezney/tahoe100m/state_transition/ST-SE-Tahoe/fewshot/state_generalization_X_state
-ST_CKPT=$ST_RUN/checkpoints/final.ckpt
+# PHAROS defaults: depth-2 diverse beam search, beam width 128, five robust
+# batches, and PCA/PLS-DA grid selection. The checkpoint defaults to
+# $ST_RUN/checkpoints/final.ckpt. Historical melanoma paths are retained.
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------------------------------
-#run the positive controls on the 3 case studies in the unsupervised search
+# Search for combinations that convert resistant to responsive post-treatment BCC cells.
 
-#panobinostat + crizotinib 
-python cell_converter.py \
+# Conversion: resist_post to response_post
+pharos open-search \
   --adata melanoma/Data_Yost2019_Skin/BCC/malignant_bcc_log1p.post_only.SE600M.h5ad \
   --start-cell "resist_post" \
   --target-cell "response_post" \
   --cell-col "response_pre_post" \
-  --embed-key X_state \
   --model-dir "$ST_RUN" \
-  --checkpoint "$ST_CKPT" \
   --output-dir melanoma_runs/search_default \
-  --algorithm diverse_beam \
-  --path-overlap-penalty 25 \
-  --max-depth 2 \
-  --beam-size 128 \
-  --prefilter-metric "sinkhorn_low_iter" \
-  --prefilter-multiplier 10 \
-  --converter-chunk-size 16 \
-  --start-sample 256 \
-  --target-sample 256 \
-  --sinkhorn-metric "cosine" \
-  --sinkhorn-epsilon 0.05 \
-  --sinkhorn-iters 100 \
-  --conversion-threshold 0.025 \
-  --robust-rerank \
-  --robust-n-samples 5 \
-  --robust-metric sinkhorn \
-  --robust-aggregation mean_plus_std \
-  --robust-std-penalty 0.5 \
-  --projection-method pca_pls_da \
-  --projection-auto-select-components \
-  --no-projection-whiten \
-  --projection-selection-pca-grid 96,128,192,256 \
-  --projection-selection-pls-grid 64,96,128,192 \
   --drug-metadata metadata/drug_metadata_sciplex.csv \
+  --skip-sample-drug-report \
   --overwrite
 
-python make_sample_drug_report.py \
+# Generate the sample/drug report with the original 100 paths, 10 targets,
+# and 10 MOAs. These plot limits require the packaged report module;
+# pharos open-search does not expose the target/MOA limits. The path-matrix
+# limit of 50 is already the report default.
+python -m pharos_cell.reports.sample_drug \
   --run-dir melanoma_runs/search_default \
   --drug-metadata metadata/drug_metadata_sciplex.csv \
   --top-n-paths 100 \
   --top-n-targets 10 \
-  --top-n-moas 10 \
-  --top-n-path-matrix 50
+  --top-n-moas 10
