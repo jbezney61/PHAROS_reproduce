@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Prepare the sciPlex A172 positive-control dataset.
+Prepare the metastatic breast cancer dataset for embedding
 
-Processing:
-1. Preserve raw UMI counts in adata.layers["counts"]
-2. Remove genes detected in fewer than 3 cells
-3. Calculate QC metrics
-4. Normalize each cell to 10,000 total counts
-5. Apply log1p
-6. Retain the top 5,000 highly variable genes
-7. Add treatment metadata and save
 """
 
 from pathlib import Path
