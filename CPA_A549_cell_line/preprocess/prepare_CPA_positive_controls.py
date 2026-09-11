@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
 """
-
-prepare the single positive control file 
-
-https://www.nature.com/articles/s41467-021-21884-z
-
-
+pre-process and prepare the 2-drug perturb-seq dataset 
+https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE206741
 """
 
 import argparse
