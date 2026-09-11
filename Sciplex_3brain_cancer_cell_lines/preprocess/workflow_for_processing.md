@@ -1,3 +1,13 @@
+# SciPlex preprocessing workflow
+
+Run the steps in order from the analysis working directory containing the
+referenced scripts and data. Execute Bash blocks in the shell and the final
+Python block in a Python session using the PHAROS environment. Continue in the
+same shell so the environment and model-path variables remain available.
+
+## 1. Convert the Seurat data to AnnData
+
+```bash
 #sciplex4 dataset containing 2-drug perturbations across 3brain cancer cell lines
 
 #https://www.cell.com/cell-genomics/fulltext/S2666-979X(23)00339-7
@@ -21,11 +31,21 @@ python make_h5ad.py
 #'GSM7056151_sciPlex_4_T98G.h5ad'
 #'GSM7056151_sciPlex_4_U87MG.h5ad'
 
+```
+
+## 2. Preprocess the three cell lines
+
+```bash
 #run the processing 
 python prepare_sciplex3_A172_simple.py
 python prepare_sciplex3_T98G_simple.py
 python prepare_sciplex3_U87MG_simple.py
 
+```
+
+## 3. Generate STATE embeddings
+
+```bash
 #run the embedding 
 SE_DIR=/oak/stanford/groups/larsms/Users/jbezney/tahoe100m/state_embedding/SE-600M
 SE_CKPT=$SE_DIR/se600m_epoch16.ckpt
@@ -66,12 +86,22 @@ state emb transform \
 #when reduced to min 3 cells found gene - minimal processing to retain as many cells as possible
 # !!! 14818 genes mapped to embedding file (out of 24162)
 
+```
+
+## 4. Merge concentration labels
+
+```bash
 #merge the 0.1uM, 1.0uM, and 10uM into one group 
 #not enough cells to keep them separate, some conditions had <10 cells 
 python add_merged_cell_types.py A172_qc_log1p.SE600M.h5ad
 python add_merged_cell_types.py T98G_qc_log1p.SE600M.h5ad
 python add_merged_cell_types.py U87MG_qc_log1p.SE600M.h5ad
 
+```
+
+## 5. Select the conversions of interest
+
+```python
 #now reduce down to the 2-drug perturbations that overlap with Tahoe vocabulary
 #5 2-drugs with 2/2 seen, and 5 2-drugs with 1/2 seen with shared MOA
 import scanpy as sc
@@ -93,4 +123,6 @@ adata.write_h5ad("positive_controls/T98G_qc_log1p.SE600M.merged.h5ad")
 adata = sc.read_h5ad('positive_controls_sciplex/U87MG_qc_log1p.SE600M.h5ad')
 adata = adata[adata.obs['cell_type_merged'].isin(keep_types)]
 adata.write_h5ad("positive_controls/U87MG_qc_log1p.SE600M.merged.h5ad")
+
+```
 

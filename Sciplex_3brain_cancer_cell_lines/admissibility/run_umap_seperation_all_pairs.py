@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
+"""Run PHAROS separation checks for paired SciPlex cell-state datasets.
+
+Read each pair's observation metadata, sample the smaller condition's cell
+count from both states, and launch ``pharos admissibility separation``.
+Preserve the SciPlex plotting settings: 50 neighbors for purity and UMAP,
+with UMAP minimum distance 0.0. Existing outputs are skipped unless requested.
+"""
 
 import argparse
 import re
+import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import anndata as ad
@@ -18,7 +25,7 @@ def sanitize_name(value: str) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Run screen_cell_line_pairs.py for every paired h5ad file "
+            "Run pharos admissibility separation for every paired h5ad file "
             "in a folder, using the smaller condition size for "
             "--cells-per-line."
         )
@@ -35,14 +42,6 @@ def main() -> None:
         type=Path,
         required=True,
         help="Root directory for all QC output folders.",
-    )
-    parser.add_argument(
-        "--qc-script",
-        type=Path,
-        default=Path(
-            "umap_seperation_QC/screen_cell_line_pairs.py"
-        ),
-        help="Path to screen_cell_line_pairs.py.",
     )
     parser.add_argument(
         "--cell-col",
@@ -82,16 +81,17 @@ def main() -> None:
 
     input_dir = args.input_dir.resolve()
     output_root = args.output_root.resolve()
-    qc_script = args.qc_script.resolve()
+    pharos_executable = shutil.which("pharos")
 
     if not input_dir.is_dir():
         raise NotADirectoryError(
             f"Input directory not found: {input_dir}"
         )
 
-    if not qc_script.is_file():
+    if pharos_executable is None:
         raise FileNotFoundError(
-            f"QC script not found: {qc_script}"
+            "The pharos command was not found on PATH. "
+            "Activate the PHAROS environment before running this script."
         )
 
     output_root.mkdir(
@@ -201,8 +201,9 @@ def main() -> None:
             continue
 
         command = [
-            sys.executable,
-            str(qc_script),
+            pharos_executable,
+            "admissibility",
+            "separation",
             "--adata",
             str(h5ad_file.resolve()),
             "--cell-col",
